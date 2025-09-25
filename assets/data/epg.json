@@ -1,0 +1,166 @@
+{
+  "today": [
+    {
+      "start_h": 6,
+      "start_m": 0,
+      "end_h": 7,
+      "end_m": 30,
+      "title": "D8 Matin",
+      "desc": "Infos & météo"
+    },
+    {
+      "start_h": 7,
+      "start_m": 30,
+      "end_h": 9,
+      "end_m": 0,
+      "title": "Foot Actu",
+      "desc": "Débats & highlights"
+    },
+    {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 11,
+      "end_m": 0,
+      "title": "Docs Express",
+      "desc": "Sélection de documentaires"
+    },
+    {
+      "start_h": 11,
+      "start_m": 0,
+      "end_h": 12,
+      "end_m": 30,
+      "title": "Séries — Marathon",
+      "desc": "Épisodes 1–3"
+    },
+    {
+      "start_h": 12,
+      "start_m": 30,
+      "end_h": 14,
+      "end_m": 0,
+      "title": "Cinéma — Popcorn",
+      "desc": "Film culte"
+    },
+    {
+      "start_h": 14,
+      "start_m": 0,
+      "end_h": 16,
+      "end_m": 0,
+      "title": "D8 Replay",
+      "desc": "Meilleurs replays"
+    },
+    {
+      "start_h": 16,
+      "start_m": 0,
+      "end_h": 18,
+      "end_m": 0,
+      "title": "Jeunesse+",
+      "desc": "Dessins animés"
+    },
+    {
+      "start_h": 18,
+      "start_m": 0,
+      "end_h": 20,
+      "end_m": 45,
+      "title": "Sport Prime",
+      "desc": "Match & analyse"
+    },
+    {
+      "start_h": 20,
+      "start_m": 45,
+      "end_h": 22,
+      "end_m": 45,
+      "title": "Série du soir",
+      "desc": "Épisodes 4–5"
+    },
+    {
+      "start_h": 22,
+      "start_m": 45,
+      "end_h": 24,
+      "end_m": 0,
+      "title": "Late Show",
+      "desc": "Talk & live"
+    }
+  ],
+  "tomorrow": [
+    {
+      "start_h": 6,
+      "start_m": 0,
+      "end_h": 7,
+      "end_m": 30,
+      "title": "D8 Matin",
+      "desc": "Infos & météo"
+    },
+    {
+      "start_h": 7,
+      "start_m": 30,
+      "end_h": 9,
+      "end_m": 0,
+      "title": "Foot Actu",
+      "desc": "Débats & highlights"
+    },
+    {
+      "start_h": 9,
+      "start_m": 0,
+      "end_h": 11,
+      "end_m": 0,
+      "title": "Docs Express",
+      "desc": "Sélection de documentaires"
+    },
+    {
+      "start_h": 11,
+      "start_m": 0,
+      "end_h": 12,
+      "end_m": 30,
+      "title": "Séries — Marathon",
+      "desc": "Épisodes 6–8"
+    },
+    {
+      "start_h": 12,
+      "start_m": 30,
+      "end_h": 14,
+      "end_m": 0,
+      "title": "Cinéma — Popcorn",
+      "desc": "Film culte"
+    },
+    {
+      "start_h": 14,
+      "start_m": 0,
+      "end_h": 16,
+      "end_m": 0,
+      "title": "D8 Replay",
+      "desc": "Meilleurs replays"
+    },
+    {
+      "start_h": 16,
+      "start_m": 0,
+      "end_h": 18,
+      "end_m": 0,
+      "title": "Jeunesse+",
+      "desc": "Dessins animés"
+    },
+    {
+      "start_h": 18,
+      "start_m": 0,
+      "end_h": 20,
+      "end_m": 45,
+      "title": "Sport Prime",
+      "desc": "Match & analyse"
+    },
+    {
+      "start_h": 20,
+      "start_m": 45,
+      "end_h": 22,
+      "end_m": 45,
+      "title": "Série du soir",
+      "desc": "Épisodes 9–10"
+    },
+    {
+      "start_h": 22,
+      "start_m": 45,
+      "end_h": 24,
+      "end_m": 0,
+      "title": "Late Show",
+      "desc": "Talk & live"
+    }
+  ]
+}

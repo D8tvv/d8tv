@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover"/>
+  <title>D8 — Accueil</title>
+  <meta name="theme-color" content="#111"/>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="assets/img/D8.png">
+  <link rel="apple-touch-icon" href="assets/img/D8.png">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body>
+  <!-- Écran de chargement -->
+  <div id="loader" aria-hidden="true">
+    <div class="spinner"></div>
+    <p id="loader-text">Chargement…</p>
+  </div>
+
+  <!-- Modale onboarding (première visite) -->
+  <div id="onboarding" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="ob-title">
+    <div class="modal-card">
+      <button class="modal-close" id="ob-close" aria-label="Fermer">×</button>
+      <div class="modal-steps">
+        <section class="step active" data-step="1">
+          <h2 id="ob-title" data-i18n="ob_welcome_title">Bienvenue sur D8</h2>
+          <p data-i18n="ob_welcome_desc">Configurons votre expérience.</p>
+          <button class="btn btn-primary next" data-next="2" data-i18n="next">Étape suivante</button>
+        </section>
+        <section class="step" data-step="2">
+          <h3 data-i18n="choose_lang">Choisissez votre langue</h3>
+          <label class="select">
+            <select id="lang-select" aria-label="Langue">
+              <option value="fr">🇫🇷 Français</option>
+              <option value="en">🇬🇧 English</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="de">🇩🇪 Deutsch</option>
+            </select>
+          </label>
+          <div class="modal-actions">
+            <button class="btn prev" data-prev="1" data-i18n="back">Retour</button>
+            <button class="btn btn-primary next" data-next="3" data-i18n="next">Étape suivante</button>
+          </div>
+        </section>
+        <section class="step" data-step="3">
+          <h3 data-i18n="choose_name">Votre pseudo</h3>
+          <input id="ob-username" class="input" type="text" placeholder="Naki" autocomplete="nickname"/>
+          <div class="modal-actions">
+            <button class="btn prev" data-prev="2" data-i18n="back">Retour</button>
+            <button class="btn btn-primary next" data-next="4" data-i18n="next">Étape suivante</button>
+          </div>
+        </section>
+        <section class="step" data-step="4">
+          <h3 data-i18n="choose_password">Mot de passe</h3>
+          <input id="ob-password" class="input" type="password" placeholder="••••••••" autocomplete="new-password"/>
+          <p class="hint" data-i18n="pwd_local_hint">Il sera enregistré en local sur cet appareil.</p>
+          <div class="modal-actions">
+            <button class="btn prev" data-prev="3" data-i18n="back">Retour</button>
+            <button id="ob-finish" class="btn btn-accent" data-i18n="finish">Terminer</button>
+          </div>
+        </section>
+        <section class="step" data-step="5">
+          <h3 id="ob-success" data-i18n="success_title">Compte créé</h3>
+          <p id="ob-success-msg">Bienvenue !</p>
+          <button class="btn btn-primary" id="ob-start" data-i18n="enter_site">Entrer sur le site</button>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pop-up retour en arrière -->
+  <div id="back-popup" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="bp-title">
+    <div class="modal-card small">
+      <h3 id="bp-title" data-i18n="back_title">Revenir en arrière ?</h3>
+      <p data-i18n="back_desc">Vous allez revenir à la page précédente.</p>
+      <div class="modal-actions">
+        <button class="btn" id="bp-cancel" data-i18n="cancel">Annuler</button>
+        <button class="btn btn-accent" id="bp-confirm" data-i18n="confirm">Confirmer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barre top à la Canal+ -->
+  <header class="topbar">
+    <div class="brand">
+      <a href="index.html" class="brand-box" aria-label="Accueil D8">
+        <img src="assets/img/D8.png" alt="D8" class="brand-logo">
+      </a>
+    </div>
+    <nav class="nav desktop-only">
+      <a href="#decouvrir" data-i18n="nav_discover">Découvrir</a>
+      <a href="tv.html">TV</a>
+      <a href="jt.html">JT</a>
+      <a href="#sport" data-i18n="nav_sport">Sport</a>
+      <a href="#divertissement" data-i18n="nav_ent">Divertissement</a>
+      <a href="#series" data-i18n="nav_series">Séries</a>
+      <a href="#cinema" data-i18n="nav_cinema">Cinéma</a>
+      <a href="#docs">Docs</a>
+      <a href="#jeunesse" data-i18n="nav_kids">Jeunesse</a>
+      <a href="#chaines" data-i18n="nav_channels">Chaînes</a>
+    </nav>
+    <div class="actions">
+      <button class="icon-btn" id="theme-toggle" title="Thème">🌓</button>
+      <button class="icon-btn" id="search" aria-label="Recherche">🔍</button>
+      <a class="btn-cta" href="#offers" data-i18n="offers">NOS OFFRES</a>
+      <div class="avatar" id="avatar" title="Compte"></div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-bg" role="img" aria-label="Image d’accueil"></div>
+    <div class="hero-content">
+      <h1 class="hero-title" data-i18n="hero_title">Bienvenue sur la nouvelle meilleure chaîne</h1>
+      <p class="hero-sub" id="hero-sub" data-i18n="hero_sub">Regardez séries, films et sport en illimité.</p>
+      <div class="hero-actions">
+        <a href="#start" class="btn btn-accent" data-i18n="watch_now">Regarder maintenant</a>
+        <a href="#offers" class="btn btn-outline" data-i18n="discover_offers">Découvrir nos offres</a>
+      </div>
+    </div>
+    <div class="hero-gradient"></div>
+  </section>
+
+  <!-- Sections -->
+  <main id="content" class="content">
+    <section class="rail">
+      <h2 class="rail-title" data-i18n="continue_watching">Continuer de regarder</h2>
+      <div class="scroller">
+        <a class="tile"><img src="assets/img/p1.jpg" alt="Programme 1"><span class="badge">Nouveau</span></a>
+        <a class="tile"><img src="assets/img/p2.jpg" alt="Programme 2"></a>
+        <a class="tile"><img src="assets/img/p3.jpg" alt="Programme 3"></a>
+        <a class="tile"><img src="assets/img/p4.jpg" alt="Programme 4"></a>
+        <a class="tile"><img src="assets/img/p5.jpg" alt="Programme 5"></a>
+      </div>
+    </section>
+    <section class="rail">
+      <h2 class="rail-title" data-i18n="trending">Tendances</h2>
+      <div class="scroller">
+        <a class="tile"><img src="assets/img/p6.jpg" alt="Programme 6"></a>
+        <a class="tile"><img src="assets/img/p7.jpg" alt="Programme 7"></a>
+        <a class="tile"><img src="assets/img/p8.jpg" alt="Programme 8"></a>
+        <a class="tile"><img src="assets/img/p9.jpg" alt="Programme 9"></a>
+        <a class="tile"><img src="assets/img/p10.jpg" alt="Programme 10"></a>
+      </div>
+    </section>
+    <section class="rail">
+      <h2 class="rail-title" data-i18n="series">Séries</h2>
+      <div class="scroller">
+        <a class="tile"><img src="assets/img/p11.jpg" alt="Série 1"></a>
+        <a class="tile"><img src="assets/img/p12.jpg" alt="Série 2"></a>
+        <a class="tile"><img src="assets/img/p13.jpg" alt="Série 3"></a>
+        <a class="tile"><img src="assets/img/p14.jpg" alt="Série 4"></a>
+        <a class="tile"><img src="assets/img/p15.jpg" alt="Série 5"></a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom nav (mobile Netflix-like) -->
+  <nav class="bottom-nav" role="navigation" aria-label="Navigation principale">
+    <a href="#home" class="bn-item active" data-i18n="home">Accueil</a>
+    <a href="#search" class="bn-item" data-i18n="search">Recherche</a>
+    <a href="#downloads" class="bn-item" data-i18n="downloads">Téléchargements</a>
+    <a href="#profile" class="bn-item" data-i18n="profile">Profil</a>
+  </nav>
+
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <a href="#" data-i18n="legal">Mentions légales</a>
+      <a href="#" data-i18n="privacy">Confidentialité</a>
+      <a href="#" data-i18n="cookies">Cookies</a>
+      <a href="#" data-i18n="help">Aide</a>
+      <button id="reset-onboarding" class="linklike" data-i18n="reset">Reconfigurer l’expérience</button>
+    </div>
+    <small>© <span id="year"></span> D8</small>
+  </footer>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

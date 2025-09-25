@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover"/>
+  <title>D8 — TV (Live)</title>
+  <meta name="theme-color" content="#111"/>
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="assets/img/D8.png">
+  <link rel="apple-touch-icon" href="assets/img/D8.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body>
+<!-- Barre top -->
+<header class="topbar">
+  <div class="brand">
+    <a href="index.html" class="brand-box" aria-label="Accueil D8">
+      <img src="assets/img/D8.png" alt="D8" class="brand-logo">
+    </a>
+  </div>
+  <nav class="nav desktop-only">
+    <a href="index.html#decouvrir" data-i18n="nav_discover">Découvrir</a>
+    <a class="active" href="tv.html">TV</a>
+    <a href="jt.html">JT</a>
+    <a href="index.html#sport" data-i18n="nav_sport">Sport</a>
+    <a href="index.html#divertissement" data-i18n="nav_ent">Divertissement</a>
+    <a href="index.html#series" data-i18n="nav_series">Séries</a>
+    <a href="index.html#cinema" data-i18n="nav_cinema">Cinéma</a>
+    <a href="index.html#docs">Docs</a>
+    <a href="index.html#jeunesse" data-i18n="nav_kids">Jeunesse</a>
+    <a href="index.html#chaines" data-i18n="nav_channels">Chaînes</a>
+  </nav>
+  <div class="actions">
+    <a class="btn-cta" href="index.html#offers" data-i18n="offers">NOS OFFRES</a>
+    <div class="avatar" id="avatar" title="Compte"></div>
+  </div>
+</header>
+
+<main class="tv-page">
+  <!-- Header TV -->
+  <section class="tv-header">
+    <div class="title-row">
+      <h1 class="tv-title">D8 DIRECT</h1>
+      <span class="live-pill" aria-label="En direct">● LIVE</span>
+    </div>
+    <p class="tv-sub" data-i18n="tv_sub">Regardez la chaîne en direct ci-dessous.</p>
+  </section>
+
+  <!-- Player (unique iframe Kick) -->
+  <section class="player-frame" aria-label="Lecteur vidéo en direct">
+    <div class="player-viewport">
+      <div class="ratio-16x9">
+        <iframe
+                src="https://player.kick.com/d8tv"
+                height="720" width="1280"
+                frameborder="0" scrolling="no"
+                allowfullscreen="true"
+                allow="autoplay; encrypted-media">
+        </iframe>
+      </div>
+    </div>
+
+    <div class="player-progress" aria-hidden="true">
+      <div class="pp-track">
+        <div class="pp-bar" id="pp-bar" style="width:20%"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EPG -->
+  <section class="epg-section">
+    <div class="epg-head">
+      <h2 class="rail-title">Programme TV</h2>
+      <div class="epg-day-switch">
+        <button class="epg-day-btn active" data-day="today">Aujourd'hui</button>
+        <button class="epg-day-btn" data-day="tomorrow">Demain</button>
+      </div>
+    </div>
+    <div id="epg-container" class="epg"></div>
+  </section>
+</main>
+
+<!-- Bottom nav (mobile Netflix-like) -->
+<nav class="bottom-nav" role="navigation" aria-label="Navigation principale">
+  <a href="index.html#home" class="bn-item" data-i18n="home">Accueil</a>
+  <a href="tv.html" class="bn-item active">TV</a>
+  <a href="#" class="bn-item disabled">Replay</a>
+  <a href="#" class="bn-item disabled">D8+</a>
+</nav>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div class="footer-grid">
+    <a href="#" data-i18n="legal">Mentions légales</a>
+    <a href="#" data-i18n="privacy">Confidentialité</a>
+    <a href="#" data-i18n="cookies">Cookies</a>
+    <a href="#" data-i18n="help">Aide</a>
+  </div>
+  <small>© <span id="year"></span> D8</small>
+</footer>
+
+<script src="assets/js/app.js"></script>
+<script src="assets/js/tv.js"></script>
+</body>
+</html>
