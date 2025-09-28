@@ -1,181 +1,1103 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1, viewport-fit=cover"/>
-  <title>D8 — Accueil</title>
-  <meta name="theme-color" content="#111"/>
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" type="image/png" href="assets/img/D8.png">
-  <link rel="apple-touch-icon" href="assets/img/D8.png">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D8 - Streaming Premium</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-black: #000000;
+            --primary-white: #ffffff;
+            --primary-red: #e50914;
+            --accent-pink: #ff1744;
+            --gradient-red: linear-gradient(135deg, #e50914, #ff1744);
+            --shadow: 0 4px 20px rgba(229, 9, 20, 0.3);
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: var(--primary-black);
+            color: var(--primary-white);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-black);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s;
+        }
+
+        .loading-screen.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 3px solid transparent;
+            border-top-color: var(--accent-pink);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Onboarding Modal */
+        .onboarding-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .onboarding-modal.active {
+            opacity: 1;
+        }
+
+        .onboarding-content {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(229, 9, 20, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+
+        .onboarding-modal.active .onboarding-content {
+            transform: scale(1);
+        }
+
+        .onboarding-title {
+            font-size: 28px;
+            margin-bottom: 10px;
+            background: var(--gradient-red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .onboarding-subtitle {
+            font-size: 18px;
+            margin-bottom: 30px;
+            color: #ccc;
+        }
+
+        .language-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .language-option {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+
+        .language-option:hover {
+            background: rgba(229, 9, 20, 0.2);
+            border-color: var(--accent-pink);
+            transform: translateY(-2px);
+        }
+
+        .language-option.selected {
+            background: rgba(229, 9, 20, 0.3);
+            border-color: var(--primary-red);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent-pink);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: var(--gradient-red);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .success-message {
+            display: none;
+            font-size: 20px;
+            color: #4caf50;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .header.scrolled {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 36px;
+            font-weight: bold;
+            background: var(--gradient-red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: logoGlow 3s infinite;
+        }
+
+        @keyframes logoGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-item {
+            color: #ccc;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            font-size: 16px;
+            padding: 5px 10px;
+        }
+
+        .nav-item:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-item.active {
+            color: var(--accent-pink);
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-red);
+            transition: width 0.3s;
+        }
+
+        .nav-item.active::after,
+        .nav-item:hover::after {
+            width: 100%;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-profile:hover {
+            background: rgba(229, 9, 20, 0.3);
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--gradient-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a1a, #e50914, #ff1744);
+            opacity: 0.3;
+            animation: gradientShift 10s infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            text-align: center;
+            z-index: 1;
+            padding: 20px;
+            animation: slideUp 1s;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-title {
+            font-size: clamp(32px, 6vw, 72px);
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+            animation: titleGlow 3s infinite;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5); }
+            50% { text-shadow: 2px 2px 20px rgba(229, 9, 20, 0.8); }
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn-hero {
+            padding: 15px 40px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-play {
+            background: var(--gradient-red);
+            color: white;
+        }
+
+        .btn-play:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(229, 9, 20, 0.5);
+        }
+
+        .btn-info {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-info:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: 80px 50px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s;
+        }
+
+        .content-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            font-size: 32px;
+            margin-bottom: 30px;
+            background: var(--gradient-red);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .content-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .content-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(229, 9, 20, 0.3);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #2d2d2d, #1a1a1a);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+        }
+
+        .card-title {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .card-meta {
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        /* Mobile Responsive */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.98);
+            padding: 10px 0;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mobile-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #ccc;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent-pink);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 5px;
+            fill: currentColor;
+        }
+
+        .nav-label {
+            font-size: 10px;
+        }
+
+        /* Back Button */
+        .back-button {
+            position: fixed;
+            top: 100px;
+            left: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+            z-index: 999;
+            display: none;
+        }
+
+        .back-button:hover {
+            background: rgba(229, 9, 20, 0.3);
+            transform: translateX(-5px);
+        }
+
+        .back-button.show {
+            display: block;
+            animation: slideInLeft 0.5s;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Notification Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: -400px;
+            background: linear-gradient(135deg, rgba(229, 9, 20, 0.9), rgba(255, 23, 68, 0.9));
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            transition: right 0.3s;
+            z-index: 10001;
+        }
+
+        .toast.show {
+            right: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .user-profile {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .hero-title {
+                font-size: 32px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .content-section {
+                padding: 40px 20px;
+            }
+
+            .content-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .card-image {
+                height: 200px;
+            }
+
+            .onboarding-content {
+                padding: 30px 20px;
+            }
+
+            .language-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- Écran de chargement -->
-  <div id="loader" aria-hidden="true">
-    <div class="spinner"></div>
-    <p id="loader-text">Chargement…</p>
-  </div>
-
-  <!-- Modale onboarding (première visite) -->
-  <div id="onboarding" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="ob-title">
-    <div class="modal-card">
-      <button class="modal-close" id="ob-close" aria-label="Fermer">×</button>
-      <div class="modal-steps">
-        <section class="step active" data-step="1">
-          <h2 id="ob-title" data-i18n="ob_welcome_title">Bienvenue sur D8</h2>
-          <p data-i18n="ob_welcome_desc">Configurons votre expérience.</p>
-          <button class="btn btn-primary next" data-next="2" data-i18n="next">Étape suivante</button>
-        </section>
-        <section class="step" data-step="2">
-          <h3 data-i18n="choose_lang">Choisissez votre langue</h3>
-          <label class="select">
-            <select id="lang-select" aria-label="Langue">
-              <option value="fr">🇫🇷 Français</option>
-              <option value="en">🇬🇧 English</option>
-              <option value="es">🇪🇸 Español</option>
-              <option value="de">🇩🇪 Deutsch</option>
-            </select>
-          </label>
-          <div class="modal-actions">
-            <button class="btn prev" data-prev="1" data-i18n="back">Retour</button>
-            <button class="btn btn-primary next" data-next="3" data-i18n="next">Étape suivante</button>
-          </div>
-        </section>
-        <section class="step" data-step="3">
-          <h3 data-i18n="choose_name">Votre pseudo</h3>
-          <input id="ob-username" class="input" type="text" placeholder="Naki" autocomplete="nickname"/>
-          <div class="modal-actions">
-            <button class="btn prev" data-prev="2" data-i18n="back">Retour</button>
-            <button class="btn btn-primary next" data-next="4" data-i18n="next">Étape suivante</button>
-          </div>
-        </section>
-        <section class="step" data-step="4">
-          <h3 data-i18n="choose_password">Mot de passe</h3>
-          <input id="ob-password" class="input" type="password" placeholder="••••••••" autocomplete="new-password"/>
-          <p class="hint" data-i18n="pwd_local_hint">Il sera enregistré en local sur cet appareil.</p>
-          <div class="modal-actions">
-            <button class="btn prev" data-prev="3" data-i18n="back">Retour</button>
-            <button id="ob-finish" class="btn btn-accent" data-i18n="finish">Terminer</button>
-          </div>
-        </section>
-        <section class="step" data-step="5">
-          <h3 id="ob-success" data-i18n="success_title">Compte créé</h3>
-          <p id="ob-success-msg">Bienvenue !</p>
-          <button class="btn btn-primary" id="ob-start" data-i18n="enter_site">Entrer sur le site</button>
-        </section>
-      </div>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
     </div>
-  </div>
 
-  <!-- Pop-up retour en arrière -->
-  <div id="back-popup" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="bp-title">
-    <div class="modal-card small">
-      <h3 id="bp-title" data-i18n="back_title">Revenir en arrière ?</h3>
-      <p data-i18n="back_desc">Vous allez revenir à la page précédente.</p>
-      <div class="modal-actions">
-        <button class="btn" id="bp-cancel" data-i18n="cancel">Annuler</button>
-        <button class="btn btn-accent" id="bp-confirm" data-i18n="confirm">Confirmer</button>
-      </div>
-    </div>
-  </div>
+    <!-- Onboarding Modal -->
+    <div class="onboarding-modal" id="onboardingModal">
+        <div class="onboarding-content">
+            <!-- Step 1: Welcome -->
+            <div class="onboarding-step" id="step1">
+                <h2 class="onboarding-title">Bienvenue sur D8</h2>
+                <p class="onboarding-subtitle">Configurons votre expérience</p>
+                <button class="btn-primary" onclick="nextStep(2)">Commencer</button>
+            </div>
 
-  <!-- Barre top à la Canal+ -->
-  <header class="topbar">
-    <div class="brand">
-      <a href="index.html" class="brand-box" aria-label="Accueil D8">
-        <img src="assets/img/D8.png" alt="D8" class="brand-logo">
-      </a>
+            <!-- Step 2: Language Selection -->
+            <div class="onboarding-step" id="step2" style="display: none;">
+                <h2 class="onboarding-title">Choisissez votre langue</h2>
+                <div class="language-grid">
+                    <div class="language-option" onclick="selectLanguage('fr', this)">
+                        🇫🇷 Français
+                    </div>
+                    <div class="language-option" onclick="selectLanguage('en', this)">
+                        🇬🇧 English
+                    </div>
+                    <div class="language-option" onclick="selectLanguage('es', this)">
+                        🇪🇸 Español
+                    </div>
+                    <div class="language-option" onclick="selectLanguage('de', this)">
+                        🇩🇪 Deutsch
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="nextStep(3)">Continuer</button>
+            </div>
+
+            <!-- Step 3: Username -->
+            <div class="onboarding-step" id="step3" style="display: none;">
+                <h2 class="onboarding-title">Créez votre profil</h2>
+                <div class="input-group">
+                    <label>Votre pseudo</label>
+                    <input type="text" id="username" placeholder="Entrez votre pseudo">
+                </div>
+                <button class="btn-primary" onclick="nextStep(4)">Suivant</button>
+            </div>
+
+            <!-- Step 4: Password -->
+            <div class="onboarding-step" id="step4" style="display: none;">
+                <h2 class="onboarding-title">Sécurisez votre compte</h2>
+                <div class="input-group">
+                    <label>Mot de passe</label>
+                    <input type="password" id="password" placeholder="Créez un mot de passe">
+                </div>
+                <button class="btn-primary" onclick="completeOnboarding()">Terminer</button>
+            </div>
+
+            <!-- Step 5: Success -->
+            <div class="onboarding-step" id="step5" style="display: none;">
+                <div class="success-message" id="successMessage"></div>
+                <button class="btn-primary" onclick="closeOnboarding()">Accéder à D8</button>
+            </div>
+        </div>
     </div>
-    <nav class="nav desktop-only">
-      <a href="#decouvrir" data-i18n="nav_discover">Découvrir</a>
-      <a href="tv.html">TV</a>
-      <a href="jt.html">JT</a>
-      <a href="#sport" data-i18n="nav_sport">Sport</a>
-      <a href="#divertissement" data-i18n="nav_ent">Divertissement</a>
-      <a href="#series" data-i18n="nav_series">Séries</a>
-      <a href="#cinema" data-i18n="nav_cinema">Cinéma</a>
-      <a href="#docs">Docs</a>
-      <a href="#jeunesse" data-i18n="nav_kids">Jeunesse</a>
-      <a href="#chaines" data-i18n="nav_channels">Chaînes</a>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="nav-container">
+            <div class="logo">
+                <img src="assets/img/D8.png" alt="D8" style="height: 40px; width: auto;">
+            </div>
+            <nav>
+                <ul class="nav-menu" id="navMenu">
+                    <li class="nav-item active" data-lang="nav-home">Accueil</li>
+                    <li class="nav-item" data-lang="nav-tv" onclick="window.location.href='tv.html'">TV</li>
+                    <li class="nav-item" data-lang="nav-programs">PROGRAMMES</li>
+                    <li class="nav-item" data-lang="nav-plus">D8+</li>
+                </ul>
+            </nav>
+            <div class="user-profile" id="userProfile">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <span id="userName">User</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Back Button -->
+    <button class="back-button" id="backButton" onclick="goBack()">← Retour</button>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1 class="hero-title" data-lang="hero-title">Bienvenue sur la nouvelle meilleure chaîne</h1>
+            <div class="hero-buttons">
+                <button class="btn-hero btn-play" data-lang="btn-play">▶ Lecture</button>
+                <button class="btn-hero btn-info" data-lang="btn-info">ℹ Plus d'infos</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Sections -->
+    <section class="content-section" id="trending">
+        <h2 class="section-title" data-lang="trending-title">Tendances actuelles</h2>
+        <div class="content-grid">
+            <div class="content-card">
+                <div class="card-image">
+                    <div class="card-overlay">
+                        <h3 class="card-title" data-lang="card-title-1">Programme Premium</h3>
+                        <p class="card-meta">Nouveau • 2024</p>
+                    </div>
+                </div>
+            </div>
+            <div class="content-card">
+                <div class="card-image">
+                    <div class="card-overlay">
+                        <h3 class="card-title" data-lang="card-title-2">Série Exclusive</h3>
+                        <p class="card-meta">Populaire • HD</p>
+                    </div>
+                </div>
+            </div>
+            <div class="content-card">
+                <div class="card-image">
+                    <div class="card-overlay">
+                        <h3 class="card-title" data-lang="card-title-3">Documentaire</h3>
+                        <p class="card-meta">Primé • 4K</p>
+                    </div>
+                </div>
+            </div>
+            <div class="content-card">
+                <div class="card-image">
+                    <div class="card-overlay">
+                        <h3 class="card-title" data-lang="card-title-4">Live Show</h3>
+                        <p class="card-meta">En direct</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-menu">
+        <div class="mobile-nav">
+            <div class="mobile-nav-item active">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                <span class="nav-label" data-lang="nav-home">Accueil</span>
+            </div>
+            <div class="mobile-nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z"/>
+                </svg>
+                <span class="nav-label" data-lang="nav-tv">TV</span>
+            </div>
+            <div class="mobile-nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/>
+                </svg>
+                <span class="nav-label" data-lang="nav-programs">Programmes</span>
+            </div>
+            <div class="mobile-nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+                </svg>
+                <span class="nav-label" data-lang="nav-plus">D8+</span>
+            </div>
+        </div>
     </nav>
-    <div class="actions">
-      <button class="icon-btn" id="theme-toggle" title="Thème">🌓</button>
-      <button class="icon-btn" id="search" aria-label="Recherche">🔍</button>
-      <a class="btn-cta" href="#offers" data-i18n="offers">NOS OFFRES</a>
-      <div class="avatar" id="avatar" title="Compte"></div>
-    </div>
-  </header>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="hero-bg" role="img" aria-label="Image d’accueil"></div>
-    <div class="hero-content">
-      <h1 class="hero-title" data-i18n="hero_title">Bienvenue sur la nouvelle meilleure chaîne</h1>
-      <p class="hero-sub" id="hero-sub" data-i18n="hero_sub">Regardez séries, films et sport en illimité.</p>
-      <div class="hero-actions">
-        <a href="#start" class="btn btn-accent" data-i18n="watch_now">Regarder maintenant</a>
-        <a href="#offers" class="btn btn-outline" data-i18n="discover_offers">Découvrir nos offres</a>
-      </div>
-    </div>
-    <div class="hero-gradient"></div>
-  </section>
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
 
-  <!-- Sections -->
-  <main id="content" class="content">
-    <section class="rail">
-      <h2 class="rail-title" data-i18n="continue_watching">Continuer de regarder</h2>
-      <div class="scroller">
-        <a class="tile"><img src="assets/img/p1.jpg" alt="Programme 1"><span class="badge">Nouveau</span></a>
-        <a class="tile"><img src="assets/img/p2.jpg" alt="Programme 2"></a>
-        <a class="tile"><img src="assets/img/p3.jpg" alt="Programme 3"></a>
-        <a class="tile"><img src="assets/img/p4.jpg" alt="Programme 4"></a>
-        <a class="tile"><img src="assets/img/p5.jpg" alt="Programme 5"></a>
-      </div>
-    </section>
-    <section class="rail">
-      <h2 class="rail-title" data-i18n="trending">Tendances</h2>
-      <div class="scroller">
-        <a class="tile"><img src="assets/img/p6.jpg" alt="Programme 6"></a>
-        <a class="tile"><img src="assets/img/p7.jpg" alt="Programme 7"></a>
-        <a class="tile"><img src="assets/img/p8.jpg" alt="Programme 8"></a>
-        <a class="tile"><img src="assets/img/p9.jpg" alt="Programme 9"></a>
-        <a class="tile"><img src="assets/img/p10.jpg" alt="Programme 10"></a>
-      </div>
-    </section>
-    <section class="rail">
-      <h2 class="rail-title" data-i18n="series">Séries</h2>
-      <div class="scroller">
-        <a class="tile"><img src="assets/img/p11.jpg" alt="Série 1"></a>
-        <a class="tile"><img src="assets/img/p12.jpg" alt="Série 2"></a>
-        <a class="tile"><img src="assets/img/p13.jpg" alt="Série 3"></a>
-        <a class="tile"><img src="assets/img/p14.jpg" alt="Série 4"></a>
-        <a class="tile"><img src="assets/img/p15.jpg" alt="Série 5"></a>
-      </div>
-    </section>
-  </main>
+    <!-- Include User Manager -->
+    <script src="assets/js/user-manager.js"></script>
+    <script>
+        // App State (now using localStorage via userManager)
+        let appState = {
+            user: null,
+            language: 'fr',
+            isFirstVisit: true,
+            currentStep: 1
+        };
 
-  <!-- Bottom nav (mobile Netflix-like) -->
-  <nav class="bottom-nav" role="navigation" aria-label="Navigation principale">
-    <a href="#home" class="bn-item active" data-i18n="home">Accueil</a>
-    <a href="#search" class="bn-item" data-i18n="search">Recherche</a>
-    <a href="#downloads" class="bn-item" data-i18n="downloads">Téléchargements</a>
-    <a href="#profile" class="bn-item" data-i18n="profile">Profil</a>
-  </nav>
+        // Translations
+        const translations = {
+            fr: {
+                'nav-home': 'Accueil',
+                'nav-tv': 'TV',
+                'nav-programs': 'PROGRAMMES',
+                'nav-plus': 'D8+',
+                'hero-title': 'Bienvenue sur la nouvelle meilleure chaîne',
+                'btn-play': '▶ Lecture',
+                'btn-info': 'ℹ Plus d\'infos',
+                'trending-title': 'Tendances actuelles',
+                'card-title-1': 'Programme Premium',
+                'card-title-2': 'Série Exclusive',
+                'card-title-3': 'Documentaire',
+                'card-title-4': 'Live Show',
+                'welcome-message': 'Bienvenue sur D8',
+                'configure-experience': 'Configurons votre expérience',
+                'choose-language': 'Choisissez votre langue',
+                'create-profile': 'Créez votre profil',
+                'secure-account': 'Sécurisez votre compte',
+                'success-message': 'Félicitations {name} ! Votre compte a été créé avec succès.',
+                'back': '← Retour'
+            },
+            en: {
+                'nav-home': 'Home',
+                'nav-tv': 'TV',
+                'nav-programs': 'PROGRAMS',
+                'nav-plus': 'D8+',
+                'hero-title': 'Welcome to the new best channel',
+                'btn-play': '▶ Play',
+                'btn-info': 'ℹ More Info',
+                'trending-title': 'Trending Now',
+                'card-title-1': 'Premium Program',
+                'card-title-2': 'Exclusive Series',
+                'card-title-3': 'Documentary',
+                'card-title-4': 'Live Show',
+                'welcome-message': 'Welcome to D8',
+                'configure-experience': 'Let\'s configure your experience',
+                'choose-language': 'Choose your language',
+                'create-profile': 'Create your profile',
+                'secure-account': 'Secure your account',
+                'success-message': 'Congratulations {name}! Your account has been created successfully.',
+                'back': '← Back'
+            },
+            es: {
+                'nav-home': 'Inicio',
+                'nav-tv': 'TV',
+                'nav-programs': 'PROGRAMAS',
+                'nav-plus': 'D8+',
+                'hero-title': 'Bienvenido al nuevo mejor canal',
+                'btn-play': '▶ Reproducir',
+                'btn-info': 'ℹ Más información',
+                'trending-title': 'Tendencias actuales',
+                'card-title-1': 'Programa Premium',
+                'card-title-2': 'Serie Exclusiva',
+                'card-title-3': 'Documental',
+                'card-title-4': 'Show en Vivo',
+                'welcome-message': 'Bienvenido a D8',
+                'configure-experience': 'Configuremos tu experiencia',
+                'choose-language': 'Elige tu idioma',
+                'create-profile': 'Crea tu perfil',
+                'secure-account': 'Asegura tu cuenta',
+                'success-message': '¡Felicidades {name}! Tu cuenta ha sido creada exitosamente.',
+                'back': '← Atrás'
+            },
+            de: {
+                'nav-home': 'Startseite',
+                'nav-tv': 'TV',
+                'nav-programs': 'PROGRAMME',
+                'nav-plus': 'D8+',
+                'hero-title': 'Willkommen beim neuen besten Sender',
+                'btn-play': '▶ Abspielen',
+                'btn-info': 'ℹ Mehr Infos',
+                'trending-title': 'Aktuelle Trends',
+                'card-title-1': 'Premium-Programm',
+                'card-title-2': 'Exklusive Serie',
+                'card-title-3': 'Dokumentation',
+                'card-title-4': 'Live-Show',
+                'welcome-message': 'Willkommen bei D8',
+                'configure-experience': 'Lassen Sie uns Ihre Erfahrung konfigurieren',
+                'choose-language': 'Wählen Sie Ihre Sprache',
+                'create-profile': 'Erstellen Sie Ihr Profil',
+                'secure-account': 'Sichern Sie Ihr Konto',
+                'success-message': 'Glückwunsch {name}! Ihr Konto wurde erfolgreich erstellt.',
+                'back': '← Zurück'
+            }
+        };
 
-  <footer class="site-footer">
-    <div class="footer-grid">
-      <a href="#" data-i18n="legal">Mentions légales</a>
-      <a href="#" data-i18n="privacy">Confidentialité</a>
-      <a href="#" data-i18n="cookies">Cookies</a>
-      <a href="#" data-i18n="help">Aide</a>
-      <button id="reset-onboarding" class="linklike" data-i18n="reset">Reconfigurer l’expérience</button>
-    </div>
-    <small>© <span id="year"></span> D8</small>
-  </footer>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize user manager and check if user is configured
+            const isUserConfigured = userManager.initialize();
 
-  <script src="assets/js/app.js"></script>
+            // Get user data
+            const userData = userManager.getUser();
+            if (userData) {
+                appState.user = userData;
+                appState.language = userData.language;
+                appState.isFirstVisit = !isUserConfigured;
+            }
+
+            // Simulate loading
+            setTimeout(() => {
+                document.getElementById('loadingScreen').classList.add('hide');
+                
+                // Check if first visit and no user configured
+                if (appState.isFirstVisit && !isUserConfigured) {
+                    document.getElementById('onboardingModal').classList.add('active');
+                } else if (userData && userData.username) {
+                    // Update hero title with username
+                    const heroTitle = document.querySelector('.hero-title');
+                    if (heroTitle) {
+                        heroTitle.textContent = `${userData.username}, ${translations[appState.language]['hero-title'].toLowerCase()}`;
+                    }
+                }
+            }, 2000);
+
+            // Scroll effects
+            window.addEventListener('scroll', () => {
+                const header = document.getElementById('header');
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+
+                // Show back button on scroll
+                const backButton = document.getElementById('backButton');
+                if (window.scrollY > 300) {
+                    backButton.classList.add('show');
+                } else {
+                    backButton.classList.remove('show');
+                }
+
+                // Animate content sections
+                const sections = document.querySelectorAll('.content-section');
+                sections.forEach(section => {
+                    const rect = section.getBoundingClientRect();
+                    if (rect.top < window.innerHeight - 100) {
+                        section.classList.add('visible');
+                    }
+                });
+            });
+
+            // Nav item clicks - Navigation fonctionnelle vers TV
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    const langKey = this.getAttribute('data-lang');
+
+                    if (langKey === 'nav-tv') {
+                        // Navigation vers TV avec données utilisateur préservées
+                        userManager.navigateToTV();
+                        return;
+                    }
+
+                    // Remove active from all
+                    document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(i => {
+                        i.classList.remove('active');
+                    });
+                    
+                    // Add active to clicked
+                    this.classList.add('active');
+                    
+                    // Show toast
+                    if (langKey && translations[appState.language][langKey]) {
+                        showToast(`Section ${translations[appState.language][langKey]} sélectionnée`);
+                    }
+                });
+            });
+
+            // Mobile nav TV click
+            document.querySelectorAll('.mobile-nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    const navLabel = this.querySelector('.nav-label');
+                    if (navLabel && navLabel.textContent.toLowerCase().includes('tv')) {
+                        e.preventDefault();
+                        userManager.navigateToTV();
+                        return;
+                    }
+                });
+            });
+
+            // Content card hover effects
+            document.querySelectorAll('.content-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    showToast('Chargement du contenu...');
+                });
+            });
+        });
+
+        // Onboarding functions
+        function selectLanguage(lang, element) {
+            appState.language = lang;
+            
+            // Update UI selection
+            document.querySelectorAll('.language-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            
+            // Update language in user manager
+            userManager.updateLanguage(lang);
+
+            // Update all text
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            document.querySelectorAll('[data-lang]').forEach(element => {
+                const key = element.getAttribute('data-lang');
+                if (translations[appState.language][key]) {
+                    element.textContent = translations[appState.language][key];
+                }
+            });
+        }
+
+        function nextStep(step) {
+            // Validate current step
+            if (step === 3 && !appState.language) {
+                showToast('Veuillez sélectionner une langue');
+                return;
+            }
+            
+            if (step === 4) {
+                const username = document.getElementById('username').value;
+                if (!username) {
+                    showToast('Veuillez entrer un pseudo');
+                    return;
+                }
+                if (!appState.user) appState.user = {};
+                appState.user.username = username;
+            }
+            
+            // Hide all steps
+            document.querySelectorAll('.onboarding-step').forEach(s => {
+                s.style.display = 'none';
+            });
+            
+            // Show next step
+            document.getElementById(`step${step}`).style.display = 'block';
+            appState.currentStep = step;
+        }
+
+        function completeOnboarding() {
+            const password = document.getElementById('password').value;
+            if (!password) {
+                showToast('Veuillez entrer un mot de passe');
+                return;
+            }
+            
+            // Save user data via user manager
+            const userData = {
+                username: appState.user.username,
+                password: password,
+                language: appState.language,
+                settings: {}
+            };
+
+            if (userManager.saveUser(userData)) {
+                appState.isFirstVisit = false;
+
+                // Update UI with username
+                userManager.updateUI();
+
+                // Show success message
+                const successMsg = translations[appState.language]['success-message'].replace('{name}', userData.username);
+                document.getElementById('successMessage').textContent = successMsg;
+                document.getElementById('successMessage').style.display = 'block';
+
+                nextStep(5);
+            } else {
+                showToast('Erreur lors de la sauvegarde');
+            }
+        }
+
+        function closeOnboarding() {
+            document.getElementById('onboardingModal').classList.remove('active');
+            showToast(`Bienvenue ${appState.user.username} !`);
+            
+            // Update hero title with username
+            const heroTitle = document.querySelector('.hero-title');
+            if (heroTitle) {
+                heroTitle.textContent = `${appState.user.username}, ${translations[appState.language]['hero-title'].toLowerCase()}`;
+            }
+        }
+
+        function goBack() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
 </body>
 </html>
+

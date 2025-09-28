@@ -1,197 +1,243 @@
-/* ====== Utils / Storage ====== */
+/* ========= D8 Home – Routing, I18n, Onboarding, Animations ========= */
+
+// --- Utils
+const $ = (q, ctx=document) => ctx.querySelector(q);
+const $$ = (q, ctx=document) => Array.from(ctx.querySelectorAll(q));
 const storage = {
-  get(key, fallback=null){
-    try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
-    catch{ return fallback; }
+  get: (k, d=null) => {
+    try{ return JSON.parse(localStorage.getItem(k)) ?? d }catch{return d}
   },
-  set(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+  set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
 };
 
-/* ====== I18N ====== */
-const I18N = {
-  fr: { ob_welcome_title:"Bienvenue sur D8", ob_welcome_desc:"Configurons votre expérience.", next:"Étape suivante", back:"Retour",
-        choose_lang:"Choisissez votre langue", choose_name:"Votre pseudo", choose_password:"Mot de passe",
-        pwd_local_hint:"Il sera enregistré en local sur cet appareil.", finish:"Terminer", success_title:"Compte créé",
-        enter_site:"Entrer sur le site", back_title:"Revenir en arrière ?", back_desc:"Vous allez revenir à la page précédente.",
-        cancel:"Annuler", confirm:"Confirmer", offers:"NOS OFFRES", nav_discover:"Découvrir", nav_sport:"Sport",
-        nav_ent:"Divertissement", nav_series:"Séries", nav_cinema:"Cinéma", nav_kids:"Jeunesse",
-        hero_title:"Bienvenue sur la nouvelle meilleure chaîne", hero_sub:"Regardez séries, films et sport en illimité.",
-        watch_now:"Regarder maintenant", discover_offers:"Découvrir nos offres", continue_watching:"Continuer de regarder",
-        trending:"Tendances", series:"Séries", legal:"Mentions légales", privacy:"Confidentialité", cookies:"Cookies",
-        help:"Aide", reset:"Reconfigurer l’expérience", home:"Accueil", search:"Recherche", downloads:"Téléchargements", profile:"Profil"
-      },
-  en: { ob_welcome_title:"Welcome to D8", ob_welcome_desc:"Let's set up your experience.", next:"Next", back:"Back",
-        choose_lang:"Choose your language", choose_name:"Your nickname", choose_password:"Password",
-        pwd_local_hint:"It will be stored locally on this device.", finish:"Finish", success_title:"Account created",
-        enter_site:"Enter the site", back_title:"Go back?", back_desc:"You are about to go to the previous page.",
-        cancel:"Cancel", confirm:"Confirm", offers:"OUR OFFERS", nav_discover:"Discover", nav_sport:"Sport",
-        nav_ent:"Entertainment", nav_series:"Series", nav_cinema:"Cinema", nav_kids:"Kids",
-        hero_title:"Welcome to the new best channel", hero_sub:"Watch series, movies and sports without limits.",
-        watch_now:"Watch now", discover_offers:"Discover our offers", continue_watching:"Continue watching",
-        trending:"Trending", series:"Series", legal:"Legal", privacy:"Privacy", cookies:"Cookies",
-        help:"Help", reset:"Reconfigure experience", home:"Home", search:"Search", downloads:"Downloads", profile:"Profile"
-      },
-  es: { ob_welcome_title:"Bienvenido a D8", ob_welcome_desc:"Configuremos tu experiencia.", next:"Siguiente", back:"Atrás",
-        choose_lang:"Elige tu idioma", choose_name:"Tu apodo", choose_password:"Contraseña",
-        pwd_local_hint:"Se guardará localmente en este dispositivo.", finish:"Finalizar", success_title:"Cuenta creada",
-        enter_site:"Entrar al sitio", back_title:"¿Volver?", back_desc:"Vas a volver a la página anterior.",
-        cancel:"Cancelar", confirm:"Confirmar", offers:"NUESTRAS OFERTAS", nav_discover:"Descubrir", nav_sport:"Deporte",
-        nav_ent:"Entretenimiento", nav_series:"Series", nav_cinema:"Cine", nav_kids:"Infantil",
-        hero_title:"Bienvenido al nuevo mejor canal", hero_sub:"Mira series, películas y deportes sin límites.",
-        watch_now:"Ver ahora", discover_offers:"Descubrir ofertas", continue_watching:"Seguir viendo",
-        trending:"Tendencias", series:"Series", legal:"Aviso legal", privacy:"Privacidad", cookies:"Cookies",
-        help:"Ayuda", reset:"Reconfigurar experiencia", home:"Inicio", search:"Buscar", downloads:"Descargas", profile:"Perfil"
-      },
-  de: { ob_welcome_title:"Willkommen bei D8", ob_welcome_desc:"Lassen Sie uns Ihr Erlebnis einrichten.", next:"Weiter", back:"Zurück",
-        choose_lang:"Wählen Sie Ihre Sprache", choose_name:"Ihr Spitzname", choose_password:"Passwort",
-        pwd_local_hint:"Wird lokal auf diesem Gerät gespeichert.", finish:"Fertig", success_title:"Konto erstellt",
-        enter_site:"Website betreten", back_title:"Zurückgehen?", back_desc:"Sie kehren zur vorherigen Seite zurück.",
-        cancel:"Abbrechen", confirm:"Bestätigen", offers:"UNSERE ANGEBOTE", nav_discover:"Entdecken", nav_sport:"Sport",
-        nav_ent:"Unterhaltung", nav_series:"Serien", nav_cinema:"Kino", nav_kids:"Kinder",
-        hero_title:"Willkommen beim neuen besten Sender", hero_sub:"Serien, Filme und Sport ohne Grenzen ansehen.",
-        watch_now:"Jetzt ansehen", discover_offers:"Angebote entdecken", continue_watching:"Weiterschauen",
-        trending:"Angesagt", series:"Serien", legal:"Impressum", privacy:"Datenschutz", cookies:"Cookies",
-        help:"Hilfe", reset:"Erlebnis neu konfigurieren", home:"Start", search:"Suche", downloads:"Downloads", profile:"Profil"
-      }
+// --- I18n
+const i18n = {
+  fr: {
+    homeTitle: "Bienvenue sur la nouvelle meilleure chaîne",
+    heroSubtitle: (name) => name ? `Salut ${name} 👋 — prêt à reprendre là où tu t’es arrêté ?`
+        : "Regardez le meilleur des séries, films et sport en illimité.",
+    discover: "Découvrir",
+    live: "TV en direct",
+    tabs: {home:"Accueil", tv:"TV", prog:"Programmes", plus:"D8 +"},
+    rails: {trend:"Tendances", cont:"Reprendre"},
+    ob: {
+      title:"Bienvenue sur D8, configurons votre expérience",
+      lang:"Choisis ta langue",
+      name:"Ton pseudo",
+      pass:"Mot de passe",
+      hint:"Tes infos sont stockées en local sur cet appareil.",
+      next:"Étape suivante",
+      finish:"Terminer",
+      done:(name)=>`Compte créé avec succès. Bienvenue ${name} !`
+    },
+    back:"Retour en arrière disponible",
+    loading:"Chargement…"
+  },
+  en: {
+    homeTitle: "Welcome to the new best channel",
+    heroSubtitle: (name) => name ? `Hey ${name} 👋 — ready to continue watching?`
+        : "Watch the best series, movies and sports.",
+    discover: "Discover",
+    live: "Live TV",
+    tabs: {home:"Home", tv:"TV", prog:"Programs", plus:"D8 +"},
+    rails: {trend:"Trending", cont:"Continue watching"},
+    ob: {
+      title:"Welcome to D8, let’s set you up",
+      lang:"Choose your language",
+      name:"Your nickname",
+      pass:"Password",
+      hint:"Your info is stored locally on this device.",
+      next:"Next step",
+      finish:"Finish",
+      done:(name)=>`Account created successfully. Welcome ${name}!`
+    },
+    back:"Back available",
+    loading:"Loading…"
+  },
+  es: {
+    homeTitle: "Bienvenido al nuevo mejor canal",
+    heroSubtitle: (name) => name ? `Hola ${name} 👋 — ¿listo para continuar?`
+        : "Mira las mejores series, películas y deportes.",
+    discover: "Descubrir",
+    live: "TV en directo",
+    tabs: {home:"Inicio", tv:"TV", prog:"Programas", plus:"D8 +"},
+    rails: {trend:"Tendencias", cont:"Continuar"},
+    ob: {
+      title:"Bienvenido a D8, configuremos tu experiencia",
+      lang:"Elige tu idioma",
+      name:"Tu apodo",
+      pass:"Contraseña",
+      hint:"Tu información se guarda localmente en este dispositivo.",
+      next:"Siguiente paso",
+      finish:"Finalizar",
+      done:(name)=>`Cuenta creada con éxito. ¡Bienvenido ${name}!`
+    },
+    back:"Volver disponible",
+    loading:"Cargando…"
+  },
+  de: {
+    homeTitle: "Willkommen beim neuen besten Sender",
+    heroSubtitle: (name) => name ? `Hi ${name} 👋 — bereit weiterzuschauen?`
+        : "Die besten Serien, Filme und Sport – unbegrenzt.",
+    discover: "Entdecken",
+    live: "Live-TV",
+    tabs: {home:"Start", tv:"TV", prog:"Programme", plus:"D8 +"},
+    rails: {trend:"Trends", cont:"Weiterschauen"},
+    ob: {
+      title:"Willkommen bei D8, richten wir dich ein",
+      lang:"Wähle deine Sprache",
+      name:"Dein Spitzname",
+      pass:"Passwort",
+      hint:"Deine Daten werden lokal gespeichert.",
+      next:"Weiter",
+      finish:"Fertig",
+      done:(name)=>`Konto erfolgreich erstellt. Willkommen ${name}!`
+    },
+    back:"Zurück verfügbar",
+    loading:"Wird geladen…"
+  }
 };
 
-function applyI18n(lang){
-  const dict = I18N[lang] || I18N.fr;
-  document.querySelectorAll("[data-i18n]").forEach(el=>{
-    const key = el.getAttribute("data-i18n");
-    if(dict[key]) el.textContent = dict[key];
-  });
-  document.documentElement.lang = lang;
+function getLang(){
+  const saved = storage.get('d8.lang','fr');
+  return i18n[saved] ? saved : 'fr';
+}
+function setLang(code){
+  storage.set('d8.lang', code);
+  applyTexts();
 }
 
-/* ====== Theme ====== */
-function applyTheme(theme){
-  const root = document.documentElement;
-  root.classList.toggle("light", theme === "light");
-  const metaTheme = document.querySelector('meta[name="theme-color"]');
-  metaTheme.setAttribute("content", theme === "light" ? "#ffffff" : "#111111");
-}
-function toggleTheme(){
-  const profile = storage.get('d8.profile') || {};
-  const next = (profile.theme === "light") ? "dark" : "light";
-  profile.theme = next;
-  storage.set('d8.profile', profile);
-  applyTheme(next);
+function applyTexts(){
+  const lang = getLang();
+  const t = i18n[lang];
+  const name = storage.get('d8.username','');
+
+  // Hero + CTAs
+  $('#heroTitle').textContent = t.homeTitle;
+  $('#heroSubtitle').textContent = t.heroSubtitle(name);
+  $('#ctaWatch').textContent = t.discover;
+  $('#ctaMore').textContent = t.live;
+
+  // Rails
+  $('#railTrending').textContent = t.rails.trend;
+  $('#railContinue').textContent = t.rails.cont;
+
+  // Tabs
+  $('#tabHome').textContent = t.tabs.home;
+  $('#tabTV').textContent = t.tabs.tv;
+  $('#tabProg').textContent = t.tabs.prog;
+  $('#tabPlus').textContent = t.tabs.plus;
+
+  // Loader & toast
+  $('#loaderText').textContent = t.loading;
+  $('#backToastText').textContent = t.back;
+
+  // Onboarding strings (in case reopened)
+  $('#obTitle').textContent = t.ob.title;
+  $('#obLangLabel').textContent = t.ob.lang;
+  $('#obNameLabel').textContent = t.ob.name;
+  $('#obPassLabel').textContent = t.ob.pass;
+  $('#obHint').textContent = t.ob.hint;
+  $('#nextToName').textContent = t.ob.next;
+  $('#nextToPass').textContent = t.ob.next;
+  $('#finishOb').textContent = t.ob.finish;
 }
 
-/* ====== Loader ====== */
-function hideLoader(){ document.getElementById('loader').classList.add('hidden'); }
-
-/* ====== Onboarding ====== */
-const onboardingEl = document.getElementById('onboarding');
-const steps = [...document.querySelectorAll('.step')];
-function showModal(mod){ mod.classList.remove('hidden'); }
-function hideModal(mod){ mod.classList.add('hidden'); }
-function goStep(n){ steps.forEach(s=>s.classList.toggle('active', s.dataset.step === String(n))); }
-function initOnboarding(){
-  const profile = storage.get('d8.profile');
-  if(!profile){ showModal(onboardingEl); goStep(1); }
-  else{
-    applyI18n(profile.lang || 'fr');
-    applyTheme(profile.theme || 'dark');
-    personalize(profile);
+// --- Onboarding flow
+function maybeOpenOnboarding(){
+  const hasUser = !!storage.get('d8.username', '');
+  if(!hasUser){
+    $('#onboard').showModal();
+    $('#obLang').value = getLang();
+    stepTo('lang');
   }
 }
-function personalize(profile){
-  const sub = document.getElementById('hero-sub');
-  const dict = I18N[profile.lang || 'fr'];
-  sub.textContent = `${dict.hero_sub} ${profile.username ? `— ${profile.username}` : ''}`;
-  const avatar = document.getElementById('avatar');
-  avatar.textContent = profile.username ? profile.username[0].toUpperCase() : "";
+function stepTo(step){
+  $$('.ob-step').forEach(s => s.classList.remove('active'));
+  $(`.ob-step--${step}`).classList.add('active');
 }
-document.addEventListener('click', (e)=>{
-  const nextBtn = e.target.closest('.next');
-  const prevBtn = e.target.closest('.prev');
-  if(nextBtn){ goStep(nextBtn.dataset.next); }
-  if(prevBtn){ goStep(prevBtn.dataset.prev); }
-});
-document.getElementById('ob-close').addEventListener('click', ()=> hideModal(onboardingEl));
-document.getElementById('ob-finish').addEventListener('click', ()=>{
-  const lang = document.getElementById('lang-select').value || 'fr';
-  const username = (document.getElementById('ob-username').value || '').trim() || 'Invité';
-  const password = document.getElementById('ob-password').value || '';
-  const profile = { lang, username, passwordSaved: !!password, theme: 'dark' };
-  storage.set('d8.profile', profile);
-  storage.set('d8.secret', password);
-  applyI18n(lang);
-  applyTheme(profile.theme);
-  personalize(profile);
-  const dict = I18N[lang];
-  document.getElementById('ob-success').textContent = dict.success_title;
-  document.getElementById('ob-success-msg').textContent = `${username}, ${dict.success_title.toLowerCase()} !`;
-  goStep(5);
-});
-document.getElementById('ob-start').addEventListener('click', ()=> hideModal(onboardingEl));
-document.getElementById('reset-onboarding').addEventListener('click', ()=>{
-  localStorage.removeItem('d8.profile');
-  localStorage.removeItem('d8.secret');
-  showModal(onboardingEl); goStep(1);
-});
+function finishOnboarding(){
+  const lang = $('#obLang').value;
+  const name = ($('#obName').value || '').trim();
+  const pass = $('#obPass').value || '';
+  if(!name || !pass){ return; }
+  setLang(lang);
+  storage.set('d8.username', name);
+  storage.set('d8.password', pass); // local only, as demandé
+  applyTexts();
+  // Success mini modal
+  const msg = i18n[getLang()].ob.done(name);
+  $('#onboard').close();
+  showToast(msg, 2800);
+  // Avatar initial
+  $('#avatar').textContent = (name[0] || 'U').toUpperCase();
+}
 
-/* ====== Back popup ====== */
-const backPopup = document.getElementById('back-popup');
-let pendingBack = false;
-window.addEventListener('popstate', (e)=>{
-  if(pendingBack){ pendingBack = false; return; }
-  e.preventDefault(); showModal(backPopup);
-});
-document.getElementById('bp-cancel').addEventListener('click', ()=> hideModal(backPopup));
-document.getElementById('bp-confirm').addEventListener('click', ()=>{ hideModal(backPopup); pendingBack = true; history.back(); });
+// --- Routing (fake)
+function navigate(route){
+  // Set active links/tabs
+  $$('.nav-link').forEach(a => a.classList.toggle('active', a.dataset.route===route));
+  $$('.tab').forEach(t => t.classList.toggle('active', t.dataset.route===route));
 
-/* ====== Fake route changes with loader ====== */
-document.querySelectorAll('a[href^="#"]').forEach(a=>{
-  a.addEventListener('click', (e)=>{
-    const href = a.getAttribute('href');
-    if(href.length>1){
-      e.preventDefault();
-      document.getElementById('loader').classList.remove('hidden');
-      setTimeout(()=>{ hideLoader(); history.pushState({}, "", href); }, 400);
-    }
-  });
-});
+  // Show loader & toast back hint
+  showLoader(true);
+  setTimeout(() => {
+    showLoader(false);
+    showBackToast();
+    // Fake anchor
+    history.pushState({route}, '', `#${route}`);
+    // Personalize hero subtitle every nav
+    applyTexts();
+  }, 640 + Math.random()*240);
+}
 
-/* ====== Drag-to-Scroll for scrollers ====== */
-document.querySelectorAll('.scroller').forEach(scroller => {
-  let isDown = false, startX = 0, scrollLeft = 0;
-  const start = (x)=>{ isDown = TrueFlag(); scroller.classList.add('grabbing'); startX = x - scroller.offsetLeft; scrollLeft = scroller.scrollLeft; };
-  const move = (x)=>{
-    if(!isDown) return;
-    const walk = (x - scroller.offsetLeft - startX) * 1.1;
-    scroller.scrollLeft = scrollLeft - walk;
-  };
-  const end = ()=>{ isDown = false; scroller.classList.remove('grabbing'); };
-  scroller.addEventListener('mousedown', e=> start(e.pageX));
-  scroller.addEventListener('mousemove', e=> move(e.pageX));
-  scroller.addEventListener('mouseleave', end);
-  scroller.addEventListener('mouseup', end);
-  scroller.addEventListener('touchstart', e=> start(e.touches[0].pageX), {passive:true});
-  scroller.addEventListener('touchmove', e=> move(e.touches[0].pageX), {passive:true});
-  scroller.addEventListener('touchend', end);
-});
-// small helper to avoid minifiers removing booleans during copy/paste
-function TrueFlag(){ return true; }
+function showLoader(flag){
+  $('#loader').classList.toggle('show', !!flag);
+}
+function showBackToast(){
+  const t = $('#backToast');
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), 2300);
+}
+function showToast(text, ms=2000){
+  const t = $('#backToast');
+  $('#backToastText').textContent = text;
+  t.classList.add('show');
+  setTimeout(()=>{ t.classList.remove('show'); applyTexts(); }, ms);
+}
 
-/* ====== Theme toggle button ====== */
-document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+// --- Events
+window.addEventListener('DOMContentLoaded', () => {
+  // Personalisation initiale
+  const user = storage.get('d8.username','');
+  if(user) $('#avatar').textContent = (user[0]||'U').toUpperCase();
 
-/* Year */
-document.getElementById('year').textContent = new Date().getFullYear();
+  applyTexts();
+  maybeOpenOnboarding();
 
-/* Boot */
-window.addEventListener('load', ()=>{
-  const profile = storage.get('d8.profile') || {};
-  applyI18n(profile.lang || 'fr');
-  applyTheme(profile.theme || 'dark');
-  personalize(profile || {});
-  setTimeout(hideLoader, 450);
-  initOnboarding();
-  // PWA register
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('service-worker.js');
-  }
+  // Desktop nav
+  $$('.nav-link').forEach(a => a.addEventListener('click', (e)=>{
+    e.preventDefault(); navigate(a.dataset.route);
+  }));
+  // Mobile tabs
+  $$('.tab').forEach(t => t.addEventListener('click', (e)=>{
+    e.preventDefault(); navigate(t.dataset.route);
+  }));
+  // CTA
+  $('#ctaWatch').addEventListener('click', ()=> navigate('programmes'));
+  $('#ctaMore').addEventListener('click', ()=> navigate('tv'));
+
+  // Back button in toast
+  $('#goBackBtn').addEventListener('click', ()=> history.back());
+  window.addEventListener('popstate', ()=> showBackToast());
+
+  // Onboarding steps
+  $('#nextToName').addEventListener('click', ()=> stepTo('name'));
+  $('#backToLang').addEventListener('click', ()=> stepTo('lang'));
+  $('#nextToPass').addEventListener('click', ()=> stepTo('pass'));
+  $('#backToName').addEventListener('click', ()=> stepTo('name'));
+  $('#onboardForm').addEventListener('submit', (e)=>{ e.preventDefault(); finishOnboarding(); });
+
+  // Lang live switch when selecting during onboarding
+  $('#obLang').addEventListener('change', (e)=> setLang(e.target.value));
 });
