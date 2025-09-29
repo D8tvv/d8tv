@@ -2,23 +2,19 @@
 
 class D8UserManager {
     constructor() {
-        this.storageKeys = {
-            username: 'd8_user_username',
-            language: 'd8_user_language',
-            password: 'd8_user_password',
-            settings: 'd8_user_settings',
-            isConfigured: 'd8_user_configured'
-        };
+        this.storageKey = 'd8_user_data'; // Clé unique pour toutes les données
     }
 
     // Sauvegarder les données utilisateur
     saveUser(userData) {
         try {
-            localStorage.setItem(this.storageKeys.username, userData.username || '');
-            localStorage.setItem(this.storageKeys.language, userData.language || 'fr');
-            localStorage.setItem(this.storageKeys.password, userData.password || '');
-            localStorage.setItem(this.storageKeys.settings, JSON.stringify(userData.settings || {}));
-            localStorage.setItem(this.storageKeys.isConfigured, 'true');
+            const currentData = this.getUser() || {};
+            const mergedData = {
+                ...currentData,
+                ...userData,
+                lastUpdated: new Date().toISOString()
+            };
+            localStorage.setItem(this.storageKey, JSON.stringify(mergedData));
             return true;
         } catch (error) {
             console.error('Erreur lors de la sauvegarde:', error);
@@ -29,14 +25,9 @@ class D8UserManager {
     // Récupérer les données utilisateur
     getUser() {
         try {
-            const user = {
-                username: localStorage.getItem(this.storageKeys.username) || '',
-                language: localStorage.getItem(this.storageKeys.language) || 'fr',
-                password: localStorage.getItem(this.storageKeys.password) || '',
-                settings: JSON.parse(localStorage.getItem(this.storageKeys.settings) || '{}'),
-                isConfigured: localStorage.getItem(this.storageKeys.isConfigured) === 'true'
-            };
-            return user;
+            const data = localStorage.getItem(this.storageKey);
+            if (!data) return null;
+            return JSON.parse(data);
         } catch (error) {
             console.error('Erreur lors de la récupération:', error);
             return null;
@@ -46,13 +37,15 @@ class D8UserManager {
     // Vérifier si un utilisateur est configuré
     isUserConfigured() {
         const user = this.getUser();
-        return user && user.isConfigured && user.username.length > 0;
+        return user && user.username && user.username.length > 0;
     }
 
     // Mettre à jour le pseudo
     updateUsername(newUsername) {
         if (newUsername && newUsername.trim().length > 0) {
-            localStorage.setItem(this.storageKeys.username, newUsername.trim());
+            const user = this.getUser() || {};
+            user.username = newUsername.trim();
+            this.saveUser(user);
             this.updateUI();
             return true;
         }
@@ -62,7 +55,9 @@ class D8UserManager {
     // Mettre à jour la langue
     updateLanguage(newLanguage) {
         if (newLanguage && ['fr', 'en', 'es', 'de'].includes(newLanguage)) {
-            localStorage.setItem(this.storageKeys.language, newLanguage);
+            const user = this.getUser() || {};
+            user.language = newLanguage;
+            this.saveUser(user);
             return true;
         }
         return false;
@@ -71,35 +66,49 @@ class D8UserManager {
     // Mettre à jour l'interface utilisateur
     updateUI() {
         const user = this.getUser();
-        if (!user || !user.username) return;
 
         // Mettre à jour le nom d'utilisateur
         const userNameElements = document.querySelectorAll('#userName, .user-name');
         userNameElements.forEach(el => {
-            if (el) el.textContent = user.username;
+            if (el) {
+                if (user && user.username) {
+                    el.textContent = user.username;
+                } else {
+                    // Ne pas afficher "Utilisateur" par défaut
+                    el.style.display = 'none';
+                }
+            }
         });
 
         // Mettre à jour l'avatar
         const userAvatarElements = document.querySelectorAll('#userAvatar, .user-avatar');
         userAvatarElements.forEach(el => {
-            if (el) el.textContent = user.username.charAt(0).toUpperCase();
+            if (el) {
+                if (user && user.username) {
+                    el.textContent = user.username.charAt(0).toUpperCase();
+                    el.style.display = 'flex';
+                } else {
+                    // Icône par défaut si pas d'utilisateur
+                    el.innerHTML = '<svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+                }
+            }
         });
 
-        // Mettre à jour les éléments personnalisés
-        const personalizedElements = document.querySelectorAll('[data-personalized]');
-        personalizedElements.forEach(el => {
-            const template = el.getAttribute('data-personalized');
-            if (template) {
-                el.textContent = template.replace('{username}', user.username);
+        // Masquer/Afficher le profil si pas d'utilisateur
+        const userProfileElements = document.querySelectorAll('#userProfile, .user-profile');
+        userProfileElements.forEach(el => {
+            if (el) {
+                if (!user || !user.username) {
+                    el.style.cursor = 'pointer';
+                    el.title = 'Se connecter';
+                }
             }
         });
     }
 
     // Effacer toutes les données utilisateur
     clearUser() {
-        Object.values(this.storageKeys).forEach(key => {
-            localStorage.removeItem(key);
-        });
+        localStorage.removeItem(this.storageKey);
     }
 
     // Initialiser l'interface au chargement
@@ -114,49 +123,67 @@ class D8UserManager {
 
     // Méthodes de navigation avec préservation des données
     navigateToTV() {
-        const user = this.getUser();
-        if (user && user.username) {
-            window.location.href = `tv.html?user=${encodeURIComponent(user.username)}`;
-        } else {
-            window.location.href = 'tv.html';
-        }
+        window.location.href = 'tv.html';
     }
 
     navigateToHome() {
-        const user = this.getUser();
-        if (user && user.username) {
-            window.location.href = `index.html?user=${encodeURIComponent(user.username)}`;
-        } else {
-            window.location.href = 'index.html';
-        }
+        window.location.href = 'index.html';
     }
 
-    // Récupérer l'utilisateur depuis l'URL (pour compatibilité)
-    getUserFromURL() {
-        const params = new URLSearchParams(window.location.search);
-        const usernameFromURL = params.get('user');
+    navigateToD8Plus() {
+        window.location.href = 'd8plus.html';
+    }
 
-        if (usernameFromURL) {
-            // Si on a un utilisateur dans l'URL, le sauvegarder
-            const existingUser = this.getUser() || {};
-            existingUser.username = decodeURIComponent(usernameFromURL);
-            existingUser.isConfigured = true;
-            this.saveUser(existingUser);
+    // Migration depuis l'ancien système (si nécessaire)
+    migrateOldData() {
+        const oldKeys = {
+            username: 'd8_user_username',
+            language: 'd8_user_language',
+            password: 'd8_user_password',
+            settings: 'd8_user_settings',
+            isConfigured: 'd8_user_configured'
+        };
+
+        const oldUsername = localStorage.getItem(oldKeys.username);
+        if (oldUsername && !this.getUser()) {
+            // Migrer les anciennes données
+            const userData = {
+                username: oldUsername,
+                language: localStorage.getItem(oldKeys.language) || 'fr',
+                password: localStorage.getItem(oldKeys.password) || '',
+                settings: JSON.parse(localStorage.getItem(oldKeys.settings) || '{}')
+            };
+
+            this.saveUser(userData);
+
+            // Nettoyer les anciennes clés
+            Object.values(oldKeys).forEach(key => localStorage.removeItem(key));
         }
-
-        return this.getUser();
     }
 
     // Fonction d'initialisation complète
     initialize() {
-        // Récupérer l'utilisateur depuis l'URL si présent
-        this.getUserFromURL();
+        // Migrer les anciennes données si nécessaire
+        this.migrateOldData();
 
         // Initialiser l'interface
         this.initializeUI();
 
         // Retourner l'état de configuration
         return this.isUserConfigured();
+    }
+
+    // Gérer le clic sur le profil non connecté
+    handleProfileClick() {
+        if (!this.isUserConfigured()) {
+            // Déclencher l'ouverture du modal d'onboarding
+            const event = new CustomEvent('openOnboarding');
+            document.dispatchEvent(event);
+        } else {
+            // Menu utilisateur connecté (à implémenter selon besoins)
+            const event = new CustomEvent('openUserMenu');
+            document.dispatchEvent(event);
+        }
     }
 }
 
